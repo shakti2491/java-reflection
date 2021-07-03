@@ -7,4 +7,5 @@ public class GameConfig {
     private int releaseYear;
     private String gameName;
     private float price;
+    private String[] characterNames;
 }
