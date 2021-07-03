@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static final Path GAME_CONFIG_PATH = Path.of("resources/game-properties.cgf");
+    private static final Path GAME_CONFIG_PATH = Path.of("resources/game-properties.cfg");
     public static void main(String[] args) throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         GameConfig gameConfig = createConfigObject(GameConfig.class,GAME_CONFIG_PATH);
         System.out.println(gameConfig.toString());
