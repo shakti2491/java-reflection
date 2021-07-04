@@ -1,19 +1,56 @@
 package methoddiscovery.test;
 
+import methoddiscovery.api.ClothingProduct;
 import methoddiscovery.api.Product;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ProductTest {
 
     public static void main(String[] args) {
-        testGetters(Product.class);
+        testGetters(ClothingProduct.class);
+        testSetters(ClothingProduct.class);
     }
+
+
+    public static void testSetters(Class<?> dataClass) {
+        List<Field> fields = getAllFields(dataClass);
+        for(Field field: fields){
+            String setterName = "set"+capitalizeFirstLetter(field.getName());
+            Method setterMethod = null;
+            try {
+                setterMethod = dataClass.getMethod(setterName,field.getType());
+            } catch (NoSuchMethodException e) {
+                throw new IllegalStateException(String.format("Setter: %s not found",setterName));
+            }
+            if(!setterMethod.getReturnType().equals(void.class)){
+                throw new IllegalStateException(String.format("Setter method: %s has to return void",setterName));
+            }
+        }
+        System.out.println("Test for Setters Passed.");
+    }
+
+    private static List<Field> getAllFields(Class<?> clazz){
+        if(clazz == null || clazz.equals(Object.class)){
+            return Collections.emptyList();
+        }
+
+        Field[] currentClassFields = clazz.getDeclaredFields();
+        List<Field> inheritedFields = getAllFields(clazz.getSuperclass());
+
+        List<Field> allFields = new ArrayList<>();
+
+        allFields.addAll(Arrays.asList(currentClassFields));
+        allFields.addAll(inheritedFields);
+
+        return allFields;
+
+    }
+
     public static void testGetters(Class<?> dataClass){
-        Field[] fields = dataClass.getDeclaredFields();
+        List<Field> fields = getAllFields(dataClass);
 
         Map<String,Method> methodMap = mapMethodNameToMethod(dataClass);
 
@@ -38,7 +75,7 @@ public class ProductTest {
                 }
             }
 
-        System.out.println("Test Passed.");
+        System.out.println("Test for Getters Passed.");
     }
 
     private static String capitalizeFirstLetter(String fieldName) {
@@ -46,7 +83,7 @@ public class ProductTest {
     }
 
     private static Map<String, Method> mapMethodNameToMethod(Class<?> dataClass){
-        Method[] allMethods = dataClass.getDeclaredMethods();
+        Method[] allMethods = dataClass.getMethods();
 
         Map<String,Method> nameToMethod = new HashMap<>();
 
